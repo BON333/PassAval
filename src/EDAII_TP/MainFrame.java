@@ -124,8 +124,10 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         add(criarBarraEstado(), BorderLayout.SOUTH);
 
         // Sincroniza os anéis origem/destino do mapa com as ComboBox
-        java.awt.event.ItemListener il = e -> {
-            if (!atualizandoCombos && e.getStateChange() == ItemEvent.SELECTED) {
+        java.awt.event.ItemListener il = e -> 
+        {
+            if (!atualizandoCombos && e.getStateChange() == ItemEvent.SELECTED) 
+            {
                 painel.setOrigemDestino(cbOrigem.getSelectedIndex(), cbDestino.getSelectedIndex());
                 atualizarEstado();
             }
@@ -134,7 +136,7 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         cbDestino.addItemListener(il);
 
         painel.setAtraso(2000 / sliderVelocidade.getValue());
-        painel.setOuvinte(this);                       // só agora que a barra de animação já existe
+        painel.setOuvinte(this);                       // so agora que a barra de animação já existe
         refrescar(null, null);
 
         setSize(1440, 920);
@@ -144,9 +146,9 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         log("Clique = origem | botão direito = destino | arraste = mover | duplo clique = editar aresta / nova cidade.");
     }
 
-    // =====================================================================
+   
     // Construção da interface
-    // =====================================================================
+    
     private JMenuBar criarMenu() 
     {
         int mask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -284,7 +286,7 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         areaListas.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
         areaListas.setMargin(new java.awt.Insets(6, 8, 6, 8));
 
-        // Aba 4: comparação
+        // Aba 4: comparacao
         JTable tabelaComp = new JTable(modeloComparacao);
         tabelaComp.setRowHeight(24);
         tabelaComp.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -333,7 +335,7 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         b.add(btnFim);
         b.add(Box.createHorizontalStrut(10));
         b.add(new JLabel("Velocidade:"));
-        sliderVelocidade = new JSlider(1, 10, 4);          // 1 = lento (2 s por passo) ... 10 = rápido (0,2 s)
+        sliderVelocidade = new JSlider(1, 10, 4);          // 1 = lento ... 10 = rapido
         sliderVelocidade.setPreferredSize(new Dimension(130, 24));
         sliderVelocidade.setOpaque(false);
         sliderVelocidade.setToolTipText("Tempo entre passos: de 2 s (esquerda) a 0,2 s (direita)");
@@ -400,7 +402,7 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         return b;
     }
 
-    /** Dois botões lado a lado. */
+    // Dois botoes lado a lado. 
     private JPanel par(JButton a, JButton b) 
     {
         JPanel p = new JPanel(new GridLayout(1, 2, 6, 0));
@@ -415,7 +417,7 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         return p;
     }
 
-    /** Botão com estilo moderno: cantos redondos, cor de fundo, efeito ao passar o rato. */
+    // Botao com estilo moderno: cantos redondos, cor de fundo, efeito ao passar o mouse 
     static class BotaoModerno extends JButton 
     {
         private final Color base;
@@ -477,10 +479,7 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
             return this;
         }
     }
-
-    // =====================================================================
-    // Utilitários
-    // =====================================================================
+    // Utilitarios
     private void log(String s) 
     {
         console.append(s + "\n");
@@ -540,10 +539,8 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         if (atual < h && total > h + 200) split.setDividerLocation(total - h - split.getDividerSize());
     }
 
-    // =====================================================================
-    // Atualização da interface após alterações à rede
-    // =====================================================================
-    /** Atualiza tudo o que depende da rede. Tenta manter a origem/destino pelo NOME (os índices mudam). */
+    // Atualizacao da interface apos alteracoes a rede
+    // Atualiza tudo o que depende da rede. Tenta manter a origem/destino pelo NOME (os índices mudam). 
     private void refrescar(String nomeOrigem, String nomeDestino) 
     {
         recarregarCombos(nomeOrigem, nomeDestino);
@@ -620,9 +617,8 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         btnRefazer.setEnabled(grafo.podeRefazer());
     }
 
-    // =====================================================================
     // PainelGrafo.Ouvinte - eventos do rato no mapa
-    // =====================================================================
+  
     @Override public void origemEscolhida(int idx) 
     {
         if (idx >= 0 && idx < cbOrigem.getItemCount()) cbOrigem.setSelectedIndex(idx);
@@ -660,10 +656,8 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         btnPlay.setText(painel.isReproduzindo() ? "Pausar" : (tem && pos >= total ? "Repetir" : "Reproduzir"));
         lblPasso.setText(tem ? "Passo " + pos + " / " + total : "Sem animação");
     }
-
-    // =====================================================================
-    // a) / b) Matriz e Listas de Adjacências
-    // =====================================================================
+    // a) / b) Matriz e Listas de Adjacencias
+   
     private void exibirMatriz() 
     {
         if (grafo.getN() == 0) { aviso("A rede está vazia."); return; }
@@ -680,9 +674,8 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         garantirAlturaInferior(320);
     }
 
-    // =====================================================================
+    
     // c) .. f) Algoritmos
-    // =====================================================================
     private void executar(Algoritmo alg, Color cor) 
     {
         if (!redeValida()) return;
@@ -705,7 +698,7 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         if (!r.encontrado) aviso(r.mensagemErro.isEmpty() ? "Não foi possível calcular o resultado." : r.mensagemErro);
     }
 
-    /** Escreve o passo a passo, o percurso, o custo e o tempo no console. */
+    // Escreve o passo a passo, o percurso, o custo e o tempo no console. 
     private void imprimir(String titulo, Algoritmo alg, Resultado r) 
     {
         log("\n======== " + titulo + " ========");
@@ -731,12 +724,15 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         ComparadorAlgoritmos.Relatorio rel;
         try {
             rel = new ComparadorAlgoritmos().comparar(grafo, o, d);
-        } finally {
+            } 
+        finally 
+        {
             setCursor(Cursor.getDefaultCursor());
         }
         String un = grafo.getUnidade();
         modeloComparacao.setRowCount(0);
-        for (ComparadorAlgoritmos.Linha l : rel.linhas) {
+        for (ComparadorAlgoritmos.Linha l : rel.linhas) 
+        {
             modeloComparacao.addRow(new Object[]{
                 l.algoritmo,
                 l.custo == null ? "-" : l.custo + " " + un,
