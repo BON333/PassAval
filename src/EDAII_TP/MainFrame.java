@@ -157,8 +157,8 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
         JMenu ficheiro = new JMenu("Ficheiro");
         ficheiro.add(item("Nova rede vazia", null, e -> novaRedeVazia()));
         ficheiro.add(item("Abrir rede...", KeyStroke.getKeyStroke(KeyEvent.VK_O, mask), e -> abrirRede()));
-        ficheiro.add(item("Guardar rede...", KeyStroke.getKeyStroke(KeyEvent.VK_S, mask), e -> guardarRede()));
-        ficheiro.add(item("Repor rede predefinida (Ucrânia)", null, e -> reporRede()));
+        ficheiro.add(item("Repor rede predefinida (16 cidades - Mapa)", null, e -> reporRede()));
+        ficheiro.add(item("Carregar rede do enunciado (12 cidades - Teórica)", null, e -> carregarRedeTeorica()));
         ficheiro.addSeparator();
         ficheiro.add(item("Exportar mapa (PNG)...", null, e -> exportarMapa()));
         ficheiro.add(item("Exportar console (TXT)...", null, e -> exportarConsole()));
@@ -973,12 +973,21 @@ public class MainFrame extends JFrame implements PainelGrafo.Ouvinte
     }
 
     private void reporRede() {
-        int c = JOptionPane.showConfirmDialog(this, "Repor a rede ferroviária ucraniana original? (pode desfazer)",
+        int c = JOptionPane.showConfirmDialog(this, "Repor a rede predefinida (16 cidades)? (pode desfazer)",
                 "Repor rede", JOptionPane.YES_NO_OPTION);
         if (c != JOptionPane.YES_OPTION) return;
         grafo.reporRedePadrao();
         refrescar(null, null);
-        log("\nRede predefinida reposta (12 cidades, 17 conexões).");
+        log("\nRede predefinida reposta (" + grafo.getN() + " cidades, " + grafo.getArestas().size() + " conexões).");
+    }
+
+    private void carregarRedeTeorica() {
+        int c = JOptionPane.showConfirmDialog(this, "Carregar a rede teórica do enunciado (12 cidades, 17 conexões)? (pode desfazer)",
+                "Rede teórica", JOptionPane.YES_NO_OPTION);
+        if (c != JOptionPane.YES_OPTION) return;
+        grafo.reporRedeV1();
+        refrescar(null, null);
+        log("\nRede teórica do enunciado carregada (12 cidades, 17 conexões).");
     }
 
     private void mostrarAjuda() {

@@ -40,6 +40,7 @@ public class TestesAlgoritmos {
         testarPersistencia();
         testarRedeDesconexa();
         testarComparador();
+        testarRedeExpandidaV2();
 
         System.out.println();
         System.out.println("Testes executados: " + total + "   Falhas: " + falhas);
@@ -77,8 +78,8 @@ public class TestesAlgoritmos {
 
     // ------------------------------------------------------------------ testes
     private static void testarEstruturas() {
-        titulo("Matriz e Listas de Adjacências");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("Matriz e Listas de Adjacências (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         igual(12, g.getN(), "nº de cidades");
         igual(17, g.getArestas().size(), "nº de arestas");
         verificarConsistencia(g, "rede predefinida");
@@ -110,8 +111,8 @@ public class TestesAlgoritmos {
     }
 
     private static void testarBuscas() {
-        titulo("DFS e BFS");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("DFS e BFS (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         Resultado bfs = new BuscaBFS().executar(g, KIEV, 0);
         // Calculado à mão (vizinhos por ordem de índice)
         igual(lista(3, 0, 1, 4, 5, 2, 8, 9, 6, 7, 10, 11), bfs.caminho, "ordem BFS a partir de Kiev");
@@ -128,8 +129,8 @@ public class TestesAlgoritmos {
     }
 
     private static void testarMst() {
-        titulo("MST: Prim e Kruskal");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("MST: Prim e Kruskal (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         Resultado k = new MstKruskal().executar(g, 0, 0);
         igual(121, k.custoTotal, "custo da MST (Kruskal), calculado à mão");
         igual(11, contarAceites(k), "Kruskal aceita V-1 = 11 arestas");
@@ -157,8 +158,8 @@ public class TestesAlgoritmos {
     }
 
     private static void testarDijkstra() {
-        titulo("Dijkstra");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("Dijkstra (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         Resultado r = new CaminhoDijkstra().executar(g, KIEV, CRIMEIA);
         igual(51, r.custoTotal, "Kiev -> Crimeia custa 51");
         igual(lista(KIEV, KREMENCHUCK, MYKOLAIV, KHERSON, CRIMEIA), r.caminho, "caminho Kiev -> Crimeia");
@@ -205,8 +206,8 @@ public class TestesAlgoritmos {
     }
 
     private static void testarRotas() {
-        titulo("Rotas de abastecimento (rede predefinida)");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("Rotas de abastecimento (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         int[][] pares = {{KIEV, CRIMEIA}, {CHERNIHIV, CRIMEIA}, {TERNOPIL, LUHANSKI}, {KIEV, KIEV}, {CRIMEIA, TERNOPIL}};
         for (int[] p : pares) {
             String nome = g.getNome(p[0]) + " -> " + g.getNome(p[1]);
@@ -273,8 +274,8 @@ public class TestesAlgoritmos {
     }
 
     private static void testarGestaoDinamica() {
-        titulo("Gestão dinâmica da rede");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("Gestão dinâmica da rede (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
 
         int novo = g.adicionarVertice("Lviv", 0.1, 0.2);
         igual(12, novo, "índice da cidade nova");
@@ -303,12 +304,12 @@ public class TestesAlgoritmos {
         igual(9, g.getPeso(g.indiceDe("Zhitomyr"), g.indiceDe("Ternopil")) - 3, "Zhitomyr-Ternopil (12) sobrevive à reindexação");
 
         // Validações
-        verificarExcecao(new Runnable() { public void run() { new GrafoFerroviarioUcraniano().adicionarVertice("kiev", 0, 0); } }, "nome repetido (sem distinguir maiúsculas)");
-        verificarExcecao(new Runnable() { public void run() { new GrafoFerroviarioUcraniano().adicionarVertice("  ", 0, 0); } }, "nome vazio");
-        verificarExcecao(new Runnable() { public void run() { new GrafoFerroviarioUcraniano().adicionarVertice("A;B", 0, 0); } }, "nome com ';'");
-        verificarExcecao(new Runnable() { public void run() { new GrafoFerroviarioUcraniano().adicionarAresta(0, 0, 5); } }, "aresta para a própria cidade");
-        verificarExcecao(new Runnable() { public void run() { new GrafoFerroviarioUcraniano().adicionarAresta(0, 1, 0); } }, "peso zero");
-        verificarExcecao(new Runnable() { public void run() { new GrafoFerroviarioUcraniano().adicionarAresta(0, 99, 5); } }, "cidade inexistente");
+        verificarExcecao(new Runnable() { public void run() { GrafoFerroviarioUcraniano.criarRedeV1().adicionarVertice("kiev", 0, 0); } }, "nome repetido (sem distinguir maiúsculas)");
+        verificarExcecao(new Runnable() { public void run() { GrafoFerroviarioUcraniano.criarRedeV1().adicionarVertice("  ", 0, 0); } }, "nome vazio");
+        verificarExcecao(new Runnable() { public void run() { GrafoFerroviarioUcraniano.criarRedeV1().adicionarVertice("A;B", 0, 0); } }, "nome com ';'");
+        verificarExcecao(new Runnable() { public void run() { GrafoFerroviarioUcraniano.criarRedeV1().adicionarAresta(0, 0, 5); } }, "aresta para a própria cidade");
+        verificarExcecao(new Runnable() { public void run() { GrafoFerroviarioUcraniano.criarRedeV1().adicionarAresta(0, 1, 0); } }, "peso zero");
+        verificarExcecao(new Runnable() { public void run() { GrafoFerroviarioUcraniano.criarRedeV1().adicionarAresta(0, 99, 5); } }, "cidade inexistente");
     }
 
     private static void verificarExcecao(Runnable r, String descricao) {
@@ -318,8 +319,8 @@ public class TestesAlgoritmos {
     }
 
     private static void testarDesfazerRefazer() {
-        titulo("Desfazer / Refazer");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("Desfazer / Refazer (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         verificar(!g.podeDesfazer(), "no início não há nada a desfazer");
         g.adicionarAresta(CHERNIHIV, CRIMEIA, 30);
         g.removerVertice(TERNOPIL);
@@ -340,7 +341,7 @@ public class TestesAlgoritmos {
 
     private static void testarPersistencia() throws IOException {
         titulo("Guardar e carregar ficheiro");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         g.adicionarVertice("São Paulo", 0.123456789, 0.5);     // acento e decimais longos
         g.adicionarAresta(g.indiceDe("São Paulo"), KIEV, 33);
         g.setUnidade("horas");
@@ -377,7 +378,7 @@ public class TestesAlgoritmos {
             File t = File.createTempFile("invalida", ".rede");
             try {
                 java.nio.file.Files.write(t.toPath(), conteudo.getBytes("UTF-8"));
-                GrafoFerroviarioUcraniano h = new GrafoFerroviarioUcraniano();
+                GrafoFerroviarioUcraniano h = GrafoFerroviarioUcraniano.criarRedeV1();
                 boolean lancou = false;
                 try { h.carregar(t); } catch (IOException e) { lancou = true; }
                 verificar(lancou, "ficheiro inválido é rejeitado: " + conteudo.replace("\n", " | "));
@@ -389,8 +390,8 @@ public class TestesAlgoritmos {
     }
 
     private static void testarRedeDesconexa() {
-        titulo("Rede desconexa");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("Rede desconexa (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         g.removerVertice(KHERSON);                       // Crimeia só ligava a Kherson: fica isolada
         int crimeia = g.indiceDe("Crimeia");
         igual(2, g.numeroComponentes(), "2 componentes após remover Kherson");
@@ -428,8 +429,8 @@ public class TestesAlgoritmos {
     }
 
     private static void testarComparador() {
-        titulo("Comparador");
-        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano();
+        titulo("Comparador (v1 - enunciado)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV1();
         ComparadorAlgoritmos.Relatorio rel = new ComparadorAlgoritmos().comparar(g, KIEV, CRIMEIA);
         igual(7, rel.linhas.size(), "7 linhas na tabela comparativa");
         verificar(rel.tudoOk, "todas as verificações cruzadas passam: " + rel.verificacoes);
@@ -458,5 +459,56 @@ public class TestesAlgoritmos {
             g.removerAresta(a.u, a.v);
         }
         return g;
+    }
+
+    private static void testarRedeExpandidaV2() {
+        titulo("Rede expandida (v2 - 16 cidades)");
+        GrafoFerroviarioUcraniano g = GrafoFerroviarioUcraniano.criarRedeV2();
+        igual(16, g.getN(), "v2: 16 cidades");
+        igual(23, g.getArestas().size(), "v2: 23 conexões");
+        verificar(g.ehConexo(), "v2 é conexa");
+        verificarConsistencia(g, "rede expandida v2");
+
+        // MST: Prim e Kruskal têm de coincidir no custo (243)
+        Resultado k = new MstKruskal().executar(g, 0, 0);
+        igual(243, k.custoTotal, "v2: custo MST Kruskal = 243");
+        igual(15, contarAceites(k), "v2: Kruskal aceita V-1 = 15 arestas");
+        for (int s = 0; s < g.getN(); s++) {
+            Resultado p = new MstPrim().executar(g, s, 0);
+            igual(243, p.custoTotal, "v2: custo MST Prim a partir de " + g.getNome(s));
+        }
+
+        // Buscas DFS e BFS alcançam todas as 16 cidades
+        for (int s = 0; s < g.getN(); s++) {
+            igual(16, new BuscaBFS().executar(g, s, 0).caminho.size(), "v2: BFS alcança 16 cidades a partir de " + g.getNome(s));
+            igual(16, new BuscaDFS().executar(g, s, 0).caminho.size(), "v2: DFS alcança 16 cidades a partir de " + g.getNome(s));
+        }
+
+        // Dijkstra vs Floyd-Warshall em todos os 256 pares
+        int[][] fw = ComparadorAlgoritmos.floydWarshall(g);
+        boolean todosDijkstra = true;
+        for (int a = 0; a < g.getN(); a++) {
+            for (int b = 0; b < g.getN(); b++) {
+                Resultado d = new CaminhoDijkstra().executar(g, a, b);
+                if (d.custoTotal != fw[a][b] || !caminhoValido(g, d.caminho, d.custoTotal)) {
+                    todosDijkstra = false;
+                }
+            }
+        }
+        verificar(todosDijkstra, "v2: Dijkstra = Floyd-Warshall em todos os 256 pares de cidades");
+
+        // Rotas de abastecimento no grafo expandido
+        int kyiv = g.indiceDe("Kyiv");
+        int crimeia = g.indiceDe("Crimeia");
+        Resultado h = new RotaHeuristica().executar(g, kyiv, crimeia);
+        Resultado o = new RotaOtima().executar(g, kyiv, crimeia);
+        verificar(h.encontrado && o.encontrado, "v2: rotas encontradas Kyiv -> Crimeia");
+        verificar(passaPorTodas(g, h.caminho), "v2: heurística passa por todas as cidades");
+        verificar(passaPorTodas(g, o.caminho), "v2: ótima passa por todas as cidades");
+        verificar(o.custoTotal <= h.custoTotal, "v2: ótima <= heurística (" + o.custoTotal + " <= " + h.custoTotal + ")");
+
+        // Comparador completo na rede v2
+        ComparadorAlgoritmos.Relatorio rel = new ComparadorAlgoritmos().comparar(g, kyiv, crimeia);
+        verificar(rel.tudoOk, "v2: todas as verificações cruzadas do comparador passam");
     }
 }

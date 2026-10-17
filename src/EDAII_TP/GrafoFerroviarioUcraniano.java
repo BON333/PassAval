@@ -70,120 +70,128 @@ public class GrafoFerroviarioUcraniano {
     private final Deque<Estado> pilhaDesfazer = new ArrayDeque<Estado>();
     private final Deque<Estado> pilhaRefazer = new ArrayDeque<Estado>();
 
-    /** Cria o grafo já com a rede ferroviária ucraniana do enunciado. */
+    /** Cria o grafo já com a rede ferroviária ucraniana predefinida (v2 - 16 cidades). */
     public GrafoFerroviarioUcraniano() {
         this(true);
     }
 
-    /** @param redePadrao true = carrega as 12 cidades do enunciado; false = rede vazia. */
+    /** @param redePadrao true = carrega a rede predefinida; false = rede vazia. */
     public GrafoFerroviarioUcraniano(boolean redePadrao) {
         if (redePadrao) carregarRedePadrao();
         reconstruir();
     }
 
+    /** Cria uma nova instância com a rede original do enunciado (12 cidades, 17 conexões). */
+    public static GrafoFerroviarioUcraniano criarRedeV1() {
+        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano(false);
+        g.carregarRedeV1();
+        g.reconstruir();
+        return g;
+    }
+
+    /** Cria uma nova instância com a rede expandida do mapa (16 cidades, 23 conexões). */
+    public static GrafoFerroviarioUcraniano criarRedeV2() {
+        GrafoFerroviarioUcraniano g = new GrafoFerroviarioUcraniano(false);
+        g.carregarRedeV2();
+        g.reconstruir();
+        return g;
+    }
+
     // ------------------------------------------------------------------
-    // Rede inicial (cidades e conexões do esboço da ficha)
+    // Redes pré-configuradas (v1 = enunciado teórico; v2 = mapa completo)
     // ------------------------------------------------------------------
-    private void carregarRedePadrao() {
-        // Nome, x, y (posições relativas aproximadas no mapa da Ucrânia; x: oeste→leste, y: norte→sul)
+
+    /** Carrega a rede original do enunciado (12 cidades, 17 conexões). */
+    public void carregarRedeV1() {
+        cidades.clear();
+        posicoes.clear();
+        arestas.clear();
+
         Object[][] c = {
-            /*{"Chernihiv", 0.50, 0.07},   {"Zhitomyr", 0.27, 0.30},   {"Ternopil", 0.06, 0.36},
+            {"Chernihiv", 0.50, 0.07},   {"Zhitomyr", 0.27, 0.30},   {"Ternopil", 0.06, 0.36},
             {"Kiev", 0.47, 0.27},        {"Kremenchuck", 0.55, 0.50}, {"Luhanski", 0.94, 0.36},
             {"Donetsk", 0.86, 0.52},     {"Mariupol", 0.92, 0.70},    {"Zaporizhia", 0.68, 0.62},
             {"Mykolaiv", 0.38, 0.76},    {"Kherson", 0.52, 0.85},     {"Crimeia", 0.70, 0.95}
-            */
-            
-            //em falta
-        		//v2
-        		// Cidades / Regiões presentes na imagem do mapa:
-        		{"Chernihiv", 0.50, 0.07},
-        		{"Summy", 0.65, 0.12},
-        		{"Zhitomyr", 0.35, 0.22},
-        		{"Kyiv", 0.44, 0.24},
-        		{"Poltava", 0.58, 0.28},
-        		{"Kharkiv", 0.72, 0.28},
-        		{"Luhansk", 0.88, 0.32},
-        		{"Vinnytsa", 0.38, 0.38},
-        		{"Kropyvnytskyi", 0.52, 0.43},
-        		{"Dinipro", 0.68, 0.43},
-        		{"Donetsk", 0.82, 0.47},
-        		{"Mykolaiv", 0.48, 0.55},
-        		{"Zaporizhya", 0.68, 0.57},
-        		{"Kherson", 0.55, 0.65},
-        		{"Odessa", 0.41, 0.67},
-        		{"Crimeia", 0.58, 0.80},
-
-        		// Regiões demarcadas por letras no Oeste (conforme a folha):
-        		/*
-        		{"A", 0.28, 0.35}, // Khmelnytskyi
-        		{"B", 0.26, 0.20}, // Rivne
-        		{"C", 0.18, 0.20}, // Volyn (Lutsk)
-        		{"D", 0.15, 0.32}, // Lviv
-        		{"E", 0.08, 0.45}  // Zakarpattia
-        		*/
         };
         for (Object[] x : c) {
             cidades.add((String) x[0]);
             posicoes.add(new double[]{(Double) x[1], (Double) x[2]});
         }
-        // {u, v, peso} - exatamente as 17 ligações do esboço
-        int[][] e = 
-        { /*  V1.0
+
+        int[][] e = {
             {0, 3, 18}, {0, 5, 25}, {1, 2, 12}, {1, 3, 9},  {1, 4, 15},  {3, 4, 11},
             {4, 8, 8},  {4, 9, 14}, {5, 6, 7},  {6, 7, 10}, {6, 8, 9},   {7, 8, 13},
             {7, 10, 16}, {8, 9, 11}, {9, 10, 6}, {10, 11, 20}, {2, 4, 22}
-            */
-        		//v2.0
-        	// Índices dos vértices na lista 'cidades':
-        	// 0: Chernihiv, 1: Summy, 2: Zhitomyr, 3: Kyiv, 4: Poltava, 5: Kharkiv,
-        	// 6: Luhansk, 7: Vinnytsa, 8: Kropyvnytskyi, 9: Dinipro, 10: Donetsk,
-        	// 11: Mykolaiv, 12: Zaporizhya, 13: Kherson, 14: Odessa, 15: Crimeia,
-        	// 16: A, 17: B, 18: C, 19: D, 20: E
-
-        	
-        	    // Norte e Centro (Kyiv, Chernihiv, Zhitomyr, Summy, Poltava)
-        	    {0, 3, 14},  // Chernihiv - Kyiv
-        	    {0, 1, 21},  // Chernihiv - Summy
-        	    {2, 3, 14},  // Zhitomyr - Kyiv
-        	    {3, 4, 34},  // Kyiv - Poltava
-        	    {1, 4, 18},  // Summy - Poltava
-        	    {1, 5, 18},  // Summy - Kharkiv
-
-        	    // Este / Leste (Kharkiv, Luhansk, Dinipro, Donetsk, Zaporizhya)
-        	    {5, 6, 33},  // Kharkiv - Luhansk
-        	    {5, 9, 21},  // Kharkiv - Dinipro
-        	    {4, 5, 14},  // Poltava - Kharkiv
-        	    {4, 9, 20},  // Poltava - Dinipro
-        	    {6, 10, 15}, // Luhansk - Donetsk
-        	    {9, 10, 25}, // Dinipro - Donetsk
-        	    {9, 12, 8},  // Dinipro - Zaporizhya
-        	    {10, 12, 22},// Donetsk - Zaporizhya
-
-        	    // Sul (Kropyvnytskyi, Vinnytsa, Mykolaiv, Kherson, Odessa, Crimeia)
-        	    {3, 7, 26},  // Kyiv - Vinnytsa
-        	    {7, 8, 18},  // Vinnytsa - Kropyvnytskyi
-        	    {4, 8, 24},  // Poltava - Kropyvnytskyi
-        	    {8, 9, 18},  // Kropyvnytskyi - Dinipro
-        	    {8, 11, 18}, // Kropyvnytskyi - Mykolaiv
-        	    {11, 13, 7},  // Mykolaiv - Kherson
-        	    {11, 14, 13}, // Mykolaiv - Odessa
-        	    {12, 13, 30}, // Zaporizhya - Kherson
-        	    {13, 15, 23}, // Kherson - Crimeia
-
-        	    // Oeste (A, B, C, D, E e ligações com Zhitomyr e Vinnytsa)
-        	   /* {18, 17, 15}, // C (Volyn) - B (Rivne)
-        	    {18, 19, 15}, // C (Volyn) - D (Lviv)
-        	    {17, 2, 19},  // B (Rivne) - Zhitomyr
-        	    {17, 16, 20}, // B (Rivne) - A (Khmelnytskyi)
-        	    {19, 16, 24}, // D (Lviv) - A (Khmelnytskyi)
-        	    {19, 20, 21}, // D (Lviv) - E (Zakarpattia)
-        	    {16, 7, 12},  // A (Khmelnytskyi) - Vinnytsa
-        	    {16, 2, 18}   // A (Khmelnytskyi) - Zhitomyr
-        	    */
-        	
         };
         for (int[] a : e) arestas.add(new Aresta(a[0], a[1], a[2]));
         unidade = "km";
+    }
+
+    /** Carrega a rede expandida do mapa da Ucrânia (16 cidades, 23 conexões). */
+    public void carregarRedeV2() {
+        cidades.clear();
+        posicoes.clear();
+        arestas.clear();
+
+        Object[][] c = {
+            {"Chernihiv", 0.50, 0.07},
+            {"Summy", 0.65, 0.12},
+            {"Zhitomyr", 0.35, 0.22},
+            {"Kyiv", 0.44, 0.24},
+            {"Poltava", 0.58, 0.28},
+            {"Kharkiv", 0.72, 0.28},
+            {"Luhansk", 0.88, 0.32},
+            {"Vinnytsa", 0.38, 0.38},
+            {"Kropyvnytskyi", 0.52, 0.43},
+            {"Dinipro", 0.68, 0.43},
+            {"Donetsk", 0.82, 0.47},
+            {"Mykolaiv", 0.48, 0.55},
+            {"Zaporizhya", 0.68, 0.57},
+            {"Kherson", 0.55, 0.65},
+            {"Odessa", 0.41, 0.67},
+            {"Crimeia", 0.58, 0.80}
+        };
+        for (Object[] x : c) {
+            cidades.add((String) x[0]);
+            posicoes.add(new double[]{(Double) x[1], (Double) x[2]});
+        }
+
+        int[][] e = {
+            // Norte e Centro (Kyiv, Chernihiv, Zhitomyr, Summy, Poltava)
+            {0, 3, 14},  // Chernihiv - Kyiv
+            {0, 1, 21},  // Chernihiv - Summy
+            {2, 3, 14},  // Zhitomyr - Kyiv
+            {3, 4, 34},  // Kyiv - Poltava
+            {1, 4, 18},  // Summy - Poltava
+            {1, 5, 18},  // Summy - Kharkiv
+
+            // Este / Leste (Kharkiv, Luhansk, Dinipro, Donetsk, Zaporizhya)
+            {5, 6, 33},  // Kharkiv - Luhansk
+            {5, 9, 21},  // Kharkiv - Dinipro
+            {4, 5, 14},  // Poltava - Kharkiv
+            {4, 9, 20},  // Poltava - Dinipro
+            {6, 10, 15}, // Luhansk - Donetsk
+            {9, 10, 25}, // Dinipro - Donetsk
+            {9, 12, 8},  // Dinipro - Zaporizhya
+            {10, 12, 22},// Donetsk - Zaporizhya
+
+            // Sul (Kropyvnytskyi, Vinnytsa, Mykolaiv, Kherson, Odessa, Crimeia)
+            {3, 7, 26},  // Kyiv - Vinnytsa
+            {7, 8, 18},  // Vinnytsa - Kropyvnytskyi
+            {4, 8, 24},  // Poltava - Kropyvnytskyi
+            {8, 9, 18},  // Kropyvnytskyi - Dinipro
+            {8, 11, 18}, // Kropyvnytskyi - Mykolaiv
+            {11, 13, 7},  // Mykolaiv - Kherson
+            {11, 14, 13}, // Mykolaiv - Odessa
+            {12, 13, 30}, // Zaporizhya - Kherson
+            {13, 15, 23}  // Kherson - Crimeia
+        };
+        for (int[] a : e) arestas.add(new Aresta(a[0], a[1], a[2]));
+        unidade = "km";
+    }
+
+    private void carregarRedePadrao() {
+        carregarRedeV2();
     }
 
     /** Reconstrói a Matriz, as Listas de Adjacências e as componentes a partir das arestas. */
@@ -415,13 +423,33 @@ public class GrafoFerroviarioUcraniano {
         reconstruir();
     }
 
-    /** Volta à rede ferroviária ucraniana do enunciado. */
+    /** Volta à rede ferroviária ucraniana predefinida. */
     public void reporRedePadrao() {
         antesDeAlterar();
         cidades.clear();
         posicoes.clear();
         arestas.clear();
         carregarRedePadrao();
+        reconstruir();
+    }
+
+    /** Repõe a rede teórica original do enunciado (12 cidades, 17 conexões). */
+    public void reporRedeV1() {
+        antesDeAlterar();
+        cidades.clear();
+        posicoes.clear();
+        arestas.clear();
+        carregarRedeV1();
+        reconstruir();
+    }
+
+    /** Repõe a rede expandida do mapa (16 cidades, 23 conexões). */
+    public void reporRedeV2() {
+        antesDeAlterar();
+        cidades.clear();
+        posicoes.clear();
+        arestas.clear();
+        carregarRedeV2();
         reconstruir();
     }
 
