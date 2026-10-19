@@ -15,18 +15,21 @@ import java.util.List;
  * que só se juntam no fim; o Prim tem sempre uma única árvore a crescer.
  * No mapa, as arestas REJEITADAS (que formariam ciclo) aparecem a tracejado.
  */
-public class MstKruskal implements Algoritmo {
+public class MstKruskal implements Algoritmo 
+{
 
     @Override public String nome() { return "MST - Kruskal"; }
 
-    @Override public String descricao() {
+    @Override public String descricao() 
+    {
         return "Ordena as arestas e usa União-Busca para evitar ciclos. Complexidade O(E log E).";
     }
 
     @Override public boolean usaDestino() { return false; }
 
     @Override
-    public Resultado executar(GrafoFerroviarioUcraniano g, int origem, int destino) {
+    public Resultado executar(GrafoFerroviarioUcraniano g, int origem, int destino) 
+    {
         Resultado r = new Resultado(nome());
         r.numerar = false;                            // aqui interessa a aresta, não a ordem dos vértices
         long t0 = System.nanoTime();
@@ -39,18 +42,22 @@ public class MstKruskal implements Algoritmo {
         UniaoBusca uf = new UniaoBusca(n);
         int aceites = 0;
         int alvo = n - g.numeroComponentes();         // nº de arestas de uma floresta geradora
-        for (Aresta e : ordenadas) {
+        for (Aresta e : ordenadas) 
+        {
             String desc = g.getNome(e.u) + " - " + g.getNome(e.v) + " (peso " + e.peso + ")";
-            if (uf.unir(e.u, e.v)) {                  // componentes diferentes -> aceita
+            if (uf.unir(e.u, e.v)) 
+            {                  // componentes diferentes -> aceita
                 aceites++;
                 r.custoTotal += e.peso;
                 r.passos.add(Passo.mover(e.u, e.v, "ACEITA " + desc + "  custo acumulado " + r.custoTotal));
                 r.log.add("ACEITA    " + desc + "   custo acumulado: " + r.custoTotal);
-            } else {                                  // mesmo componente -> fecharia um ciclo
+            } else 
+            {                                  // mesmo componente -> fecharia um ciclo
                 r.passos.add(Passo.rejeitada(e.u, e.v, "REJEITA " + desc + ": formaria um ciclo"));
                 r.log.add("rejeitada " + desc + "   -> formaria um ciclo");
             }
-            if (aceites == alvo) {
+            if (aceites == alvo) 
+            {
                 r.log.add("Já há " + alvo + " arestas aceites: a árvore está completa.");
                 break;                                // as restantes só poderiam formar ciclos
             }
